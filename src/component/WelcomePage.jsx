@@ -1,6 +1,8 @@
-import React from 'react';
+import React from 'react'
+import { useNavigate } from 'react-router'
 
 const WelcomePage = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-sans flex flex-col">
       {/* 主内容区 */}
@@ -17,7 +19,7 @@ const WelcomePage = () => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#165DFF] to-[#36BFFA] shadow-sm">体育活动室</span>
             </h1>
             <p className="text-gray-600 text-lg md:text-xl max-w-2xl mx-auto mt-6">
-              专业的运动场地，完善的健身设施，开启您的健康生活
+              找场地，找搭子，开启您的健康生活
             </p>
           </div>
           
@@ -25,7 +27,7 @@ const WelcomePage = () => {
           <div>
             <button 
               className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#165DFF] to-[#36BFFA] text-white font-semibold text-lg rounded-full shadow-lg hover:shadow-xl hover:from-[#165DFF]/90 hover:to-[#36BFFA]/90 transform hover:-translate-y-1 transition-all duration-300"
-              onClick={() => console.log('登录按钮被点击')}
+              onClick={() => navigate('/login')}
             >
               <span>登录</span>
               <i className="fa fa-arrow-right ml-2"></i>
