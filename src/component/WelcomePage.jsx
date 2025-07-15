@@ -36,7 +36,7 @@ const WelcomePage = () => {
               还没有账号？
               <span 
                 className="text-[#165DFF] hover:underline cursor-pointer"
-                onClick={() => console.log('注册链接被点击')}
+                onClick={() => navigate('/register')}
               >
                 立即注册
               </span>

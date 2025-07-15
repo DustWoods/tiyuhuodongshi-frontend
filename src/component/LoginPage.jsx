@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
+import { Link } from 'react-router'
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -23,7 +24,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-sans flex flex-col">
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 font-sans overflow-hidden">
       {/* 装饰元素 */}
       <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-secondary/10 rounded-full blur-3xl"></div>
@@ -115,16 +116,15 @@ const LoginPage = () => {
             </form>
 
             {/* 分隔线 */}
-            <div className="relative flex items-center my-6">
-              <div className="flex-grow border-t border-gray-200"></div>
-            </div>
+              <div className="relative flex items-center my-6">
+                <div className="flex-grow border-t border-gray-200"></div>
+                <span className="flex-shrink mx-4 text-gray-500">还没有账号?</span>
+                <div className="flex-grow border-t border-gray-200"></div>
+              </div>
 
             {/* 注册链接 */}
             <p className="text-center text-gray-600">
-              还没有账号?{' '}
-              <a href="#" className="text-primary hover:underline font-medium">
-                立即注册
-              </a>
+              <Link to="/register" className="text-primary hover:underline font-medium">立即注册</Link>
             </p>
           </div>
         </div>
