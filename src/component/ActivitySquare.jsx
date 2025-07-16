@@ -11,8 +11,8 @@ const ActivityCard = ({ id, name, type, date, location, participants }) => {
                     }}
                 >
                     <span className="text-center">
-                        <span className="block text-xs">7月</span>
-                        <span className="block text-lg">{date.split(' ')[0].split('月')[1].split('日')[0]}</span>
+                        <span className="block text-xs">{date.split('月')[0]}月</span>
+                        <span className="block text-lg">{date.split('月')[1].split('日')[0]}</span>
                     </span>
                 </div>
                 <div className="flex-1">
