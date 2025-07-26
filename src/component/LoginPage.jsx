@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router'
+import axios from 'axios'
 
-const LoginPage = () => {
+const LoginPage = (props) => {
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -14,13 +15,18 @@ const LoginPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // 简单验证
-    if (!formData.username || !formData.password) {
-      setError('请填写用户名和密码');
-      return;
-    }
-    // 这里可以添加实际登录逻辑
-    console.log('登录成功:', formData);
+    axios.post('http://127.0.0.1:7001/user/login', formData, { 
+      headers: { 
+        'Content-Type': 'application/json' 
+      } 
+    })
+      .then(response => {
+        props.setUsername(response.data.data.username);
+        props.setAvatar(response.data.data.avatar);
+      }) 
+      .catch(error => {
+        setError(error.response.data.message);
+      });
   };
 
   return (
@@ -87,23 +93,6 @@ const LoginPage = () => {
                     placeholder="请输入密码"
                   />
                 </div>
-              </div>
-
-              {/* 记住我和忘记密码 */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="remember"
-                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30"
-                  />
-                  <label htmlFor="remember" className="ml-2 text-sm text-gray-600">
-                    记住我
-                  </label>
-                </div>
-                <a href="#" className="text-sm text-primary hover:text-primary/80 transition-colors">
-                  忘记密码?
-                </a>
               </div>
 
               {/* 登录按钮 */}
