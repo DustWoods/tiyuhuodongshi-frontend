@@ -23,9 +23,20 @@ const LoginPage = (props) => {
       .then(response => {
         props.setUsername(response.data.data.username);
         props.setAvatar(response.data.data.avatar);
+        //登录todo
       }) 
       .catch(error => {
-        setError(error.response.data.message);
+        if(error.response){
+          const errorData = error.response.data;
+          setError(errorData.message);
+        } 
+        else if(error.request){
+          console.log('服务器无响应');
+          console.log(error);
+        }
+        else{
+          console.log('请求错误');
+        }
       });
   };
 

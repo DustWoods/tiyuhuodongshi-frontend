@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router'
+import axios from 'axios'
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
     username: '',
-    email: '',
     password: '',
     confirmPassword: ''
   });
@@ -17,18 +17,29 @@ const RegisterPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // 简单验证
-    if (!formData.username || !formData.email || !formData.password) {
-      setError('请填写所有必填字段');
-      return;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      setError('两次输入的密码不一致');
-      return;
-    }
-    // 这里可以添加实际注册逻辑
-    console.log('注册成功:', formData);
-    setSuccess(true);
+    axios.post('http://127.0.0.1:7001/user/register', formData, { 
+      headers: { 
+        'Content-Type': 'application/json' 
+      } 
+    })
+      .then(response => {
+        if(response.data.code == 200){
+          setSuccess(true);
+        }
+      }) 
+      .catch(error => {
+        if(error.response){
+          const errorData = error.response.data;
+          setError(errorData.message);
+        } 
+        else if(error.request){
+          console.log('服务器无响应');
+          console.log(error);
+        }
+        else{
+          console.log('请求错误');
+        }
+      });
   };
 
   return (
@@ -46,13 +57,13 @@ const RegisterPage = () => {
                 <i className="fa fa-check text-green-500 text-2xl"></i>
               </div>
               <h2 className="text-2xl font-bold text-gray-800 mb-2">注册成功!</h2>
-              <p className="text-gray-600 mb-6">您已成功注册账号，即将跳转到登录页面...</p>
-              <a
-                href="#"
-                className="inline-block bg-gradient-to-r from-primary to-secondary text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl hover:from-primary/90 hover:to-secondary/90 transform hover:-translate-y-1 transition-all duration-300"
+              <p className="text-gray-600 mb-6">您已成功注册账号，请跳转到登录页面...</p>
+              <Link
+                to="/login"
+                className="inline-block bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl hover:from-primary/90 hover:to-secondary/90 transform hover:-translate-y-1 transition-all duration-300"
               >
                 立即登录
-              </a>
+              </Link>
             </div>
           ) : (
             // 注册表单
@@ -89,27 +100,6 @@ const RegisterPage = () => {
                       onChange={handleChange}
                       className="pl-10 block w-full rounded-lg border-gray-200 shadow-sm focus:border-primary focus:ring focus:ring-primary/30 transition-all outline-none px-4 py-3 text-gray-700"
                       placeholder="请输入用户名"
-                    />
-                  </div>
-                </div>
-
-                {/* 邮箱输入 */}
-                <div className="mb-6">
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    邮箱
-                  </label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-                      <i className="fa fa-envelope"></i>
-                    </span>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="pl-10 block w-full rounded-lg border-gray-200 shadow-sm focus:border-primary focus:ring focus:ring-primary/30 transition-all outline-none px-4 py-3 text-gray-700"
-                      placeholder="请输入邮箱"
                     />
                   </div>
                 </div>
