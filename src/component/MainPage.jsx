@@ -56,7 +56,7 @@ const MainPage = (props) => {
             case 'my-activities':
                 return <MyActivity />;
             case 'account':
-                return <AccountManager userData={userData} onUpdate={onUpdate} />
+                return <AccountManager id={props.id} userData={userData} onUpdate={onUpdate} />
             default:
                 return null;
         }

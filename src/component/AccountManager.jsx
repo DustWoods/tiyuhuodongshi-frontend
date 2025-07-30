@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router'
+import { useNavigate } from 'react-router';
 import UserAvatar from './UserAvatar';
 import ConfirmationDialog from './ConfirmationDialog';
+import axios from 'axios';
 
-const AccountManager = ({ userData, onUpdate }) => {
+const AccountManager = ({ id, userData, onUpdate }) => {
   const [formData, setFormData] = useState({
     avatarUrl: userData.avatarUrl,
     username: userData.username,
@@ -14,6 +15,7 @@ const AccountManager = ({ userData, onUpdate }) => {
   const [isEditingAvatar, setIsEditingAvatar] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showLogOutDialog, setShowLogOutDialog] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const navigate = useNavigate();
   
@@ -39,6 +41,23 @@ const AccountManager = ({ userData, onUpdate }) => {
       reader.readAsDataURL(file);
     }
   };
+
+  const logout = () => {
+    axios.get(`http://127.0.0.1:7001/user/logout/${id}`).then(response => {
+      console.log(response.data.message);
+      navigate('/');
+    }).catch(error => {
+      if(error.response){
+        console.log(error.response.data.message);
+      }
+      else if(error.request){
+        console.log('请求未响应');
+      }
+      else{
+        console.log('请求失败');
+      }
+    })
+  }
 
   const hasChanges = () => {
     return (
@@ -81,7 +100,7 @@ const AccountManager = ({ userData, onUpdate }) => {
       <div className="container mx-auto px-4 py-6">
         <div class="container mx-auto mt-8 flex justify-start">
           <button
-            class="px-5 py-2.5 rounded-lg font-medium btn-transition flex items-center space-x-2 border border-primary/30 bg-secondary/30 text-primary hover:bg-primary/10 hover:border-primary active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50"
+            className="px-5 py-2.5 rounded-lg font-medium btn-transition flex items-center space-x-2 border border-primary/30 bg-secondary/30 text-primary hover:bg-primary/10 hover:border-primary active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50"
             onClick={() => setShowLogOutDialog(true)}
           >
             <i class="fa fa-sign-out"></i>
@@ -221,6 +240,14 @@ const AccountManager = ({ userData, onUpdate }) => {
             确定修改
           </button>
         </div>
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <button
+            onClick={() => setShowLogoutDialog(true)}
+            className={'w-full px-4 py-2 rounded-md font-medium transition-colors duration-300 bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'}
+          >
+            注销账号
+          </button>
+        </div>
       </div>
 
       {/* 确认对话框 */}
@@ -232,6 +259,11 @@ const AccountManager = ({ userData, onUpdate }) => {
       {showLogOutDialog && (
         <ConfirmationDialog cancel={() => setShowLogOutDialog(false)} confirm={() => navigate('/')}
         prompt={{first:'确定退出', second: '您确定退出吗？点击确定将立刻退出。'}} />
+      )}
+
+      {showLogoutDialog && (
+        <ConfirmationDialog cancel={() => setShowLogoutDialog(false)} confirm={logout}
+        prompt={{first:'确定注销', second: '您确定注销该账号吗？点击确定无法找回任何账号信息'}} />
       )}
     </div>
   );
