@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import UserAvatar from './UserAvatar'
+import { useNavigate } from 'react-router'
+import UserAvatar from './UserAvatar';
+import ConfirmationDialog from './ConfirmationDialog';
 
 const AccountManager = ({ userData, onUpdate }) => {
   const [formData, setFormData] = useState({
@@ -11,7 +13,10 @@ const AccountManager = ({ userData, onUpdate }) => {
 
   const [isEditingAvatar, setIsEditingAvatar] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showLogOutDialog, setShowLogOutDialog] = useState(false);
 
+  const navigate = useNavigate();
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -74,6 +79,15 @@ const AccountManager = ({ userData, onUpdate }) => {
   return (
     <div className="pt-28 pl-32 md:pl-64 pb-10">
       <div className="container mx-auto px-4 py-6">
+        <div class="container mx-auto mt-8 flex justify-start">
+          <button
+            class="px-5 py-2.5 rounded-lg font-medium btn-transition flex items-center space-x-2 border border-primary/30 bg-secondary/30 text-primary hover:bg-primary/10 hover:border-primary active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50"
+            onClick={() => setShowLogOutDialog(true)}
+          >
+            <i class="fa fa-sign-out"></i>
+            <span>退出登录</span>
+          </button>
+        </div>
         <div className="flex flex-col items-center justify-center">
           <UserAvatar avatarUrl={userData.avatarUrl} size="w-40 h-40" />
           <p className="mt-3 text-lg font-semibold text-gray-800">{userData.username}</p>
@@ -210,27 +224,14 @@ const AccountManager = ({ userData, onUpdate }) => {
       </div>
 
       {/* 确认对话框 */}
-      {showConfirmDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl transform transition-all">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">确认修改</h3>
-            <p className="text-sm text-gray-600 mb-4">您确定要修改这些信息吗？修改后将立即生效。</p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setShowConfirmDialog(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-              >
-                取消
-              </button>
-              <button
-                onClick={confirmUpdate}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-              >
-                确定修改
-              </button>
-            </div>
-          </div>
-        </div>
+      {showConfirmDialog && ( 
+        <ConfirmationDialog cancel={() => setShowConfirmDialog(false)} confirm={confirmUpdate}
+       prompt={{first: '确定修改', second: '您确定要修改这些信息吗？修改后将立即生效。'}} />
+      )}
+
+      {showLogOutDialog && (
+        <ConfirmationDialog cancel={() => setShowLogOutDialog(false)} confirm={() => navigate('/')}
+        prompt={{first:'确定退出', second: '您确定退出吗？点击确定将立刻退出。'}} />
       )}
     </div>
   );
