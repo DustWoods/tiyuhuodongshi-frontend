@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import UserAvatar from './UserAvatar'
 
 const AccountManager = ({ userData, onUpdate }) => {
@@ -66,7 +66,7 @@ const AccountManager = ({ userData, onUpdate }) => {
     if (formData.password !== '') {
       updatedData.password = formData.password;
     }
-
+    
     onUpdate(updatedData);
     setShowConfirmDialog(false);
   };
@@ -74,8 +74,9 @@ const AccountManager = ({ userData, onUpdate }) => {
   return (
     <div className="pt-28 pl-32 md:pl-64 pb-10">
       <div className="container mx-auto px-4 py-6">
-        <div className="flex items-center justify-center">
-          <UserAvatar src={formData.avatarUrl} size="w-40 h-40" />
+        <div className="flex flex-col items-center justify-center">
+          <UserAvatar avatarUrl={userData.avatarUrl} size="w-40 h-40" />
+          <p className="mt-3 text-lg font-semibold text-gray-800">{userData.username}</p>
         </div>
         {/* 分隔线 */}
         <div className="relative flex items-center my-6">
