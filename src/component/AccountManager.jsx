@@ -42,10 +42,17 @@ const AccountManager = ({ id, userData, onUpdate }) => {
     }
   };
 
+  const logOut = () => {
+    localStorage.setItem('id', '');
+    localStorage.setItem('username', '');
+    localStorage.setItem('avatarUrl', '');
+    navigate('/');
+  }
+
   const logout = () => {
     axios.get(`http://127.0.0.1:7001/user/logout/${id}`).then(response => {
       console.log(response.data.message);
-      navigate('/');
+      logOut();
     }).catch(error => {
       if(error.response){
         console.log(error.response.data.message);
@@ -257,7 +264,7 @@ const AccountManager = ({ id, userData, onUpdate }) => {
       )}
 
       {showLogOutDialog && (
-        <ConfirmationDialog cancel={() => setShowLogOutDialog(false)} confirm={() => navigate('/')}
+        <ConfirmationDialog cancel={() => setShowLogOutDialog(false)} confirm={logOUt}
         prompt={{first:'确定退出', second: '您确定退出吗？点击确定将立刻退出。'}} />
       )}
 

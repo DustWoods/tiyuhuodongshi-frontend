@@ -8,14 +8,14 @@ import AccountManager from './AccountManager';
 import axios from 'axios';
 
 const MainPage = (props) => {
-    const [avatarUrl, setAvatarUrl] = useState(`http://127.0.0.1:7001/user/avatar/${props.id}`);
+    const [avatarUrl, setAvatarUrl] = useState(`http://127.0.0.1:7001/user/avatar/${props.id}?t=${new Date().getTime()}`);
     const [sideBar, setSideBar] = useState('');
     useEffect(() => {
         const storedAvatarUrl = localStorage.getItem('avatarUrl');
         if(storedAvatarUrl){
             setAvatarUrl(storedAvatarUrl);
         }
-    })
+    },[])
 
     const updateAvatarUrl = () => {
         const newAvatarUrl = `http://127.0.0.1:7001/user/avatar/${props.id}?t=${new Date().getTime()}`;
@@ -33,7 +33,9 @@ const MainPage = (props) => {
                     localStorage.setItem('username', updatedData.username);
                     props.setUsername(updatedData.username);
                 }
-                updateAvatarUrl();
+                if(updatedData.avatarUrl){
+                    updateAvatarUrl();
+                }
             }
         }).catch(error => {
             if(error.response){
