@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router'
 import axios from 'axios'
 
 const LoginPage = (props) => {
@@ -9,6 +9,7 @@ const LoginPage = (props) => {
   });
   const [error, setError] = useState('');
 
+  const navigate = useNavigate();
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -21,9 +22,14 @@ const LoginPage = (props) => {
       } 
     })
       .then(response => {
-        props.setUsername(response.data.data.username);
-        props.setAvatar(response.data.data.avatar);
-        //登录todo
+        const { id, username } = response.data.data;
+        // 保存用户信息到localStorage
+        localStorage.setItem('id', id);
+        localStorage.setItem('username', username);
+
+        props.setId(id);
+        props.setUsername(username);
+        navigate('/main');
       }) 
       .catch(error => {
         if(error.response){
@@ -32,10 +38,10 @@ const LoginPage = (props) => {
         } 
         else if(error.request){
           console.log('服务器无响应');
-          console.log(error);
         }
         else{
           console.log('请求错误');
+          console.log(error);
         }
       });
   };

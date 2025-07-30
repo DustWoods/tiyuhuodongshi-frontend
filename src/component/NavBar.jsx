@@ -1,8 +1,7 @@
-import React from 'react'
 import UserAvatar from './UserAvatar'
 
 // 导航栏组件
-const NavBar = () => {
+const NavBar = (props) => {
     return (
         <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md h-28 flex items-center justify-between px-4 md:px-8">
             <div className="flex items-center">
@@ -16,7 +15,7 @@ const NavBar = () => {
                 </div>
             </div>
             <div className="flex items-center">
-                <UserAvatar src="https://picsum.photos/id/1005/100/100" size="w-26 h-26" />
+                <UserAvatar avatarUrl={props.avatarUrl} size="w-26 h-26" />
             </div>
         </div>
     );
