@@ -13,7 +13,7 @@ const HomeContent = (props) => {
                     <img 
                         src="../../public/image1.png" 
                         alt="示例风景图片" 
-                        class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                        className="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
                     ></img>
                 </div>
             </div>

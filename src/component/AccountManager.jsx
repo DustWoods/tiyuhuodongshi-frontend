@@ -105,7 +105,7 @@ const AccountManager = ({ id, userData, onUpdate }) => {
   return (
     <div className="pt-28 pl-32 md:pl-64 pb-10">
       <div className="container mx-auto px-4 py-6">
-        <div class="container mx-auto mt-8 flex justify-start">
+        <div className="container mx-auto mt-8 flex justify-start">
           <button
             className="px-5 py-2.5 rounded-lg font-medium btn-transition flex items-center space-x-2 border border-primary/30 bg-secondary/30 text-primary hover:bg-primary/10 hover:border-primary active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50"
             onClick={() => setShowLogOutDialog(true)}
@@ -264,7 +264,7 @@ const AccountManager = ({ id, userData, onUpdate }) => {
       )}
 
       {showLogOutDialog && (
-        <ConfirmationDialog cancel={() => setShowLogOutDialog(false)} confirm={logOUt}
+        <ConfirmationDialog cancel={() => setShowLogOutDialog(false)} confirm={logOut}
         prompt={{first:'确定退出', second: '您确定退出吗？点击确定将立刻退出。'}} />
       )}
 

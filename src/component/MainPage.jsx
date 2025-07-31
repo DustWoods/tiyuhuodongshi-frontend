@@ -13,6 +13,7 @@ const MainPage = (props) => {
     const [username, setUsername] = useState(props.username || localStorage.getItem('username'));
     const [avatarUrl, setAvatarUrl] = useState(`http://127.0.0.1:7001/user/avatar/${id}`);
     const [sideBar, setSideBar] = useState('');
+    const [activities, setActivities] = useState([]);
     const [showCreateActivityDialog, setShowCreateActivityDialog] = useState(false);
     useEffect(() => {
         const storedAvatarUrl = localStorage.getItem('avatarUrl');
@@ -21,13 +22,22 @@ const MainPage = (props) => {
         }
     })
 
+    useEffect(() => {
+    if (sideBar === 'activities') {
+        getActivities().then(data => {
+            setActivities(data);
+        });
+    }
+    }, [sideBar]);
+
     const updateAvatarUrl = () => {
         const newAvatarUrl = `http://127.0.0.1:7001/user/avatar/${id}?t=${new Date().getTime()}`;
         localStorage.setItem('avatarUrl', newAvatarUrl);
         setAvatarUrl(newAvatarUrl);
     }
+
     let userData = {username: props.username, avatarUrl: avatarUrl};
-    const onUpdate = async(updatedData) => {
+    const onUpdate = (updatedData) => {
         axios.post(`http://127.0.0.1:7001/user/modification/${id}`, updatedData).then(response => {
             if(!response.data.success){
                 alert(response.data.message);
@@ -54,12 +64,31 @@ const MainPage = (props) => {
             }
         })
     }
+
+    const getActivities = () => {
+        return axios.get('http://127.0.0.1:7001/activity/all').then(response => {
+            return response.data.data.activities;
+        }).catch(error => {
+            if(error.response){
+                console.log(error.response.data.message);
+            }
+            else if(error.request){
+                console.log('请求未响应');
+            }
+            else{
+                console.log('请求失败');
+            }
+            return [];
+        })
+    }
+
     const childrenComponent = () => {
         switch(sideBar){
             case 'dashboard':
                 return <HomeContent username={username} />;
-            case 'activities':
-                return <ActivitySquare />;
+            case 'activities':{
+                return <ActivitySquare activities={activities} />;
+            }
             case 'my-activities':
                 return <MyActivity />;
             case 'account':
@@ -68,6 +97,7 @@ const MainPage = (props) => {
                 return null;
         }
     }
+
     const registerActivity = (formData) =>{
         axios.post('http://127.0.0.1:7001/activity/register', formData).then(response => {
             console.log(response.data.message);
