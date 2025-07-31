@@ -14,6 +14,8 @@ const MainPage = (props) => {
     const [avatarUrl, setAvatarUrl] = useState(`http://127.0.0.1:7001/user/avatar/${id}`);
     const [sideBar, setSideBar] = useState('');
     const [activities, setActivities] = useState([]);
+    const [myRegisterActivies, setMyRegisterActivities] = useState([]);
+    const [myParticipateActivities, setMyParticipateAxtivities] = useState([]);
     const [showCreateActivityDialog, setShowCreateActivityDialog] = useState(false);
     useEffect(() => {
         const storedAvatarUrl = localStorage.getItem('avatarUrl');
@@ -27,6 +29,14 @@ const MainPage = (props) => {
             getActivities().then(data => {
                 setActivities(data);
             });
+        }
+        if (sideBar === 'my-activities') {
+            getMyRegisterActivities().then(data => {
+                setMyRegisterActivities(data);
+            })
+            getMyParticipateActivities().then(data => {
+                setMyParticipateAxtivities(data);
+            })
         }
     }, [sideBar]);
 
@@ -82,6 +92,39 @@ const MainPage = (props) => {
         })
     }
 
+    const getMyRegisterActivities = () => {
+        return axios.get(`http://127.0.0.1:7001/activity/register/${id}`).then(response => {
+            return response.data.data.activities;
+        }).catch(error => {
+            if(error.response){
+                console.log(error.response.data.message);
+            }
+            else if(error.request){
+                console.log('请求未响应');
+            }
+            else{
+                console.log('请求失败');
+            }
+            return [];
+        })
+    }
+
+    const getMyParticipateActivities = () => {
+        return axios.get(`http://127.0.0.1:7001/activity/participate/${id}`).then(response => {
+            return response.data.data.activities;
+        }).catch(error => {
+            if(error.response){
+                console.log(error.response.data.message);
+            }
+            else if(error.request){
+                console.log('请求未响应');
+            }
+            else{
+                console.log('请求失败');
+            }
+            return [];
+        })
+    }
     const childrenComponent = () => {
         switch(sideBar){
             case 'dashboard':
@@ -90,7 +133,7 @@ const MainPage = (props) => {
                 return <ActivitySquare userId={id} activities={activities} />;
             }
             case 'my-activities':
-                return <MyActivity />;
+                return <MyActivity userId={id} registerActivities={myRegisterActivies} participateActivities={myParticipateActivities} />;
             case 'account':
                 return <AccountManager id={id} userData={userData} onUpdate={onUpdate} />
             default:

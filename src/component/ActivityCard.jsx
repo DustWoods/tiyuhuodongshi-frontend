@@ -23,7 +23,7 @@ const ActivityCard = ({ userId, id, name, type, date, location }) => {
     // 使用await重构异步函数，增强可读性
     const fetchRelationship = async () => {
         try {
-            const formData = { userId, activityId: id };
+            const formData = { userId: userId, activityId: id };
             const response = await axios.post(`${API_BASE_URL}/relationship`, formData);
             const flag = response.data.relationship;
             setState(flag ? '取消报名' : '立即报名');
@@ -74,7 +74,6 @@ const ActivityCard = ({ userId, id, name, type, date, location }) => {
             handleAxiosError(error);
         }
     };
-    console.log('state',state);
     const moreInf = () => {
         alert("hh");
     }

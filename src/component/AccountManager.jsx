@@ -110,7 +110,7 @@ const AccountManager = ({ id, userData, onUpdate }) => {
             className="px-5 py-2.5 rounded-lg font-medium btn-transition flex items-center space-x-2 border border-primary/30 bg-secondary/30 text-primary hover:bg-primary/10 hover:border-primary active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50"
             onClick={() => setShowLogOutDialog(true)}
           >
-            <i class="fa fa-sign-out"></i>
+            <i className="fa fa-sign-out"></i>
             <span>退出登录</span>
           </button>
         </div>
