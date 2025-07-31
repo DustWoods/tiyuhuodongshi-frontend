@@ -46,6 +46,8 @@ const AccountManager = ({ id, userData, onUpdate }) => {
     localStorage.setItem('id', '');
     localStorage.setItem('username', '');
     localStorage.setItem('avatarUrl', '');
+    localStorage.setItem('sideBar', '');
+    localStorage.setItem('detail', [])
     navigate('/');
   }
 

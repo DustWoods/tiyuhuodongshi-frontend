@@ -5,7 +5,7 @@ import axios from 'axios';
 // 提取API基础URL，便于维护
 const API_BASE_URL = 'http://127.0.0.1:7001/activity';
 
-const ActivityCard = ({ userId, id, name, type, date, location, onActivityDeleted }) => {
+const ActivityCard = ({ userId, activity, onActivityDeleted, onClickCard}) => {
     const [state, setState] = useState("立即报名");
     const [participants, setParticipants] = useState("0");
     const [showCancelDialog, setShowCancelDialog] = useState(false);
@@ -25,7 +25,7 @@ const ActivityCard = ({ userId, id, name, type, date, location, onActivityDelete
     // 使用await重构异步函数，增强可读性
     const fetchRelationship = async () => {
         try {
-            const formData = { userId: userId, activityId: id };
+            const formData = { userId: userId, activityId: activity.id };
             const response = await axios.post(`${API_BASE_URL}/relationship`, formData);
             setState(response.data.state);
         } catch (error) {
@@ -37,7 +37,7 @@ const ActivityCard = ({ userId, id, name, type, date, location, onActivityDelete
     // 使用await重构异步函数，增强可读性
     const fetchParticipants = async () => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/participant/${id}`);
+            const response = await axios.get(`${API_BASE_URL}/participant/${activity.id}`);
             setParticipants(response.data.data.count);
         } catch (error) {
             handleAxiosError(error);
@@ -60,7 +60,7 @@ const ActivityCard = ({ userId, id, name, type, date, location, onActivityDelete
         };
 
         loadData();
-    }, [userId, id]); // 依赖项正确配置
+    }, [userId, activity]); // 依赖项正确配置
 
     // 修正异步处理，统一使用await语法
     const handleChange = async (e) => {
@@ -70,7 +70,7 @@ const ActivityCard = ({ userId, id, name, type, date, location, onActivityDelete
         }
         else{
             try {
-                const formData = { userId: userId, activityId: id };
+                const formData = { userId: userId, activityId: activity.id };
                 const response = await axios.post(`${API_BASE_URL}/participation`, formData);
                 console.log(response.data.message);
                 // 操作成功后更新数据
@@ -81,20 +81,18 @@ const ActivityCard = ({ userId, id, name, type, date, location, onActivityDelete
         }
     };
     const deleteActivity = () => {
-        axios.get(`${API_BASE_URL}/${id}`).then(response => {
+        axios.get(`${API_BASE_URL}/${activity.id}`).then(response => {
             console.log(response.data.message);
             onActivityDeleted && onActivityDeleted();
         }).catch(error => {
             handleAxiosError(error);
         })
     }
-    const moreInf = () => {
-        alert("hh");
-    }
+
     return (
       <>
         <div className="border border-gray-400 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200"
-            onClick={moreInf}
+            onClick={() => onClickCard(activity)}
         >
             <div className="flex items-start">
                 <div className="w-16 h-16 rounded-lg flex items-center justify-center text-white font-semibold mr-4"
@@ -104,22 +102,22 @@ const ActivityCard = ({ userId, id, name, type, date, location, onActivityDelete
                     }}
                 >
                     <span className="text-center">
-                        <span className="block text-xs">{date.split('-')[0]}年</span>
-                        <span className="block text-xs">{date.split('-')[1]}月</span>
-                        <span className="block text-lg">{date.split('-')[2].split('T')[0]}日</span>
+                        <span className="block text-xs">{activity.date.split('-')[0]}年</span>
+                        <span className="block text-xs">{activity.date.split('-')[1]}月</span>
+                        <span className="block text-lg">{activity.date.split('-')[2].split('T')[0]}日</span>
                     </span>
                 </div>
                 <div className="flex-1">
-                    <h3 className="font-semibold">{name}</h3>
+                    <h3 className="font-semibold">{activity.project}</h3>
                     <div className="flex items-center text-sm text-neutral-500 mt-1">
-                        <span>{type}</span>
+                        <span>{activity.type}</span>
                         <span className="mx-2">•</span>
                         <i className="far fa-clock mr-1"></i>
-                        <span>{date.split('-')[2].split('T')[1]}</span>
+                        <span>{activity.date.split('-')[2].split('T')[1]}</span>
                     </div>
                     <div className="flex items-center text-sm text-neutral-500 mt-1">
                         <i className="fas fa-map-marker-alt mr-1"></i>
-                        <span>{location}</span>
+                        <span>{activity.location}</span>
                     </div>
                 </div>
                 <div className="flex items-center text-sm text-neutral-500">

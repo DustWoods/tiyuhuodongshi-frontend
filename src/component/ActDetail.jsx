@@ -1,7 +1,97 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import CommentCard from './CommentCard'
+import axios from 'axios'
 
-const ActivityDetailCard = ({ activity }) => {
+const API_BASE_URL = 'http://127.0.0.1:7001/activity';
+
+const ActivityDetailCard = ({ userId, activity, setSideBar }) => {
+    const [state, setState] = useState("立即报名");
+    const [participants, setParticipants] = useState("0");
+    const [showCancelDialog, setShowCancelDialog] = useState(false);
+    const [isLoading, setIsLoading] = useState(true); // 补充缺失的loading状态定义
+
+    // 提取公共错误处理函数，减少重复代码
+    const handleAxiosError = (error) => {
+        if (error.response) {
+            console.log(error.response.data.message);
+        } else if (error.request) {
+            console.log('请求未响应');
+        } else {
+            console.log('请求失败');
+        }
+    };
+
+    // 使用await重构异步函数，增强可读性
+    const fetchRelationship = async () => {
+        try {
+            const formData = { userId: userId, activityId: activity.id };
+            const response = await axios.post(`${API_BASE_URL}/relationship`, formData);
+            setState(response.data.state);
+        } catch (error) {
+            handleAxiosError(error);
+            setState('立即报名');
+        }
+    };
+
+    // 使用await重构异步函数，增强可读性
+    const fetchParticipants = async () => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/participant/${activity.id}`);
+            setParticipants(response.data.data.count);
+        } catch (error) {
+            handleAxiosError(error);
+            setParticipants("0");
+        }
+    };
+
+    // 初始化加载数据逻辑
+    useEffect(() => {
+        const loadData = async () => {
+            setIsLoading(true);
+            try {
+                // 并行请求，提升性能
+                await Promise.all([fetchRelationship(), fetchParticipants()]);
+            } catch (error) {
+                console.log('数据加载失败');
+            } finally {
+                setIsLoading(false); // 无论成功失败都结束加载状态
+            }
+        };
+
+        loadData();
+    }, [userId, activity]); // 依赖项正确配置
+
+    // 修正异步处理，统一使用await语法
+    const handleChange = async (e) => {
+        e.stopPropagation();
+        if(state === '取消活动'){
+            setShowCancelDialog(true);
+        }
+        else{
+            try {
+                const formData = { userId: userId, activityId: activity.id };
+                const response = await axios.post(`${API_BASE_URL}/participation`, formData);
+                console.log(response.data.message);
+                // 操作成功后更新数据
+                await Promise.all([fetchRelationship(), fetchParticipants()]);
+            } catch (error) {
+                handleAxiosError(error);
+            }
+        }
+    };
+    const deleteActivity = () => {
+        axios.get(`${API_BASE_URL}/${id}`).then(response => {
+            console.log(response.data.message);
+            onActivityDeleted && onActivityDeleted();
+        }).catch(error => {
+            handleAxiosError(error);
+        })
+    }
+    const goBack = () => {
+        const src = localStorage.getItem('source');
+        localStorage.setItem('sideBar', src);
+        setSideBar(src);
+    }   
 const sampleComments = [
         {
             id: 1,
@@ -28,11 +118,12 @@ const sampleComments = [
         }
     ];
     return (
+        <>
         <div className="pt-28 pl-32 md:pl-64 pb-10 container mx-auto px-4 py-6">
             {/* 返回按钮 */}
             <div className="mb-6 mt-6">
                 <button 
-                    // onClick
+                    onClick={goBack}
                     className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                 >
                     <span className="mr-2">←</span>
@@ -42,7 +133,7 @@ const sampleComments = [
             
             {/* 活动标题 */}
             <div className="mb-6">
-                <h2 className="text-2xl font-bold text-neutral-800">{activity.name}</h2>
+                <h2 className="text-2xl font-bold text-neutral-800">{activity.project}</h2>
             </div>
             
             {/* 活动信息 */}
@@ -52,7 +143,7 @@ const sampleComments = [
                         <span className="text-primary mr-2">📅</span>
                         <span className="font-medium">活动时间</span>
                     </div>
-                    <p className="text-neutral-600">{activity.date}</p>
+                    <p className="text-neutral-600">{activity.date.split('T')[0]}  {activity.date.split('T')[1]}</p>
                 </div>
                 
                 <div className="bg-neutral-50 p-4 rounded-lg">
@@ -76,7 +167,7 @@ const sampleComments = [
                         <span className="text-primary mr-2">👥</span>
                         <span className="font-medium">参与人数</span>
                     </div>
-                    <p className="text-neutral-600">{activity.participants}人已报名</p>
+                    <p className="text-neutral-600">{participants}人已报名</p>
                 </div>
             </div>
             
@@ -84,21 +175,17 @@ const sampleComments = [
             <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-3">活动详情</h3>
                 <p className="text-neutral-600 leading-relaxed">
-                    这是一场精彩的{activity.type}活动，欢迎各位爱好者踊跃参加！活动将在{activity.date}于{activity.location}举行，
-                    旨在为大家提供一个交流和锻炼的平台。无论您是初学者还是有经验的选手，都能在这里找到乐趣和挑战。
+                    {activity.description}
                 </p>
             </div>
             
             {/* 参与按钮 */}
             <div className="mt-8">
                 <button 
-                    className="w-full py-3 rounded-lg font-medium text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                    style={{
-                        background: 'linear-gradient(135deg, #165DFF 0%, #36BFFA 100%)',
-                        color: 'white'
-                    }}
+                    className={`${state === '立即报名'? 'bg-green-600': 'bg-red-600'} text-white w-full py-3 rounded-lg font-medium text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1`}
+                    onClick={handleChange}
                 >
-                    立即报名参加
+                    {state}
                 </button>
             </div>
             
@@ -121,6 +208,12 @@ const sampleComments = [
                 </button>
             </div>
         </div>
+        {showCancelDialog && (
+            <ConfirmationDialog cancel={() => setShowCancelDialog(false)} confirm={deleteActivity} 
+                prompt={{first: '确定取消活动', second: '您确定取消活动吗？点击确定无法找回任何信息。'}}
+            />
+        )}
+        </>
     );
 };
 

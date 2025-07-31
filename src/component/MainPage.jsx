@@ -5,17 +5,19 @@ import HomeContent from './HomeContent';
 import ActivitySquare from './ActivitySquare';
 import MyActivity from './MyActivity';
 import AccountManager from './AccountManager';
-import CreateActivityDialog from './CreateActivityDialog'
+import CreateActivityDialog from './CreateActivityDialog';
+import ActDetail from './ActDetail'
 import axios from 'axios';
 
 const MainPage = (props) => {
-    const [id, setId] = useState(props.id || localStorage.getItem('id'));
+    const id = props.id || localStorage.getItem('id');
     const [username, setUsername] = useState(props.username || localStorage.getItem('username'));
     const [avatarUrl, setAvatarUrl] = useState(`http://127.0.0.1:7001/user/avatar/${id}`);
-    const [sideBar, setSideBar] = useState('');
+    const [sideBar, setSideBar] = useState('' || localStorage.getItem('sideBar'));
     const [activities, setActivities] = useState([]);
     const [myRegisterActivies, setMyRegisterActivities] = useState([]);
     const [myParticipateActivities, setMyParticipateAxtivities] = useState([]);
+    const [detail, setDetail] = useState(localStorage.getItem('detail') ? JSON.parse(localStorage.getItem('detail')) : []);
     const [showCreateActivityDialog, setShowCreateActivityDialog] = useState(false);
     useEffect(() => {
         const storedAvatarUrl = localStorage.getItem('avatarUrl');
@@ -37,6 +39,12 @@ const MainPage = (props) => {
             getMyParticipateActivities().then(data => {
                 setMyParticipateAxtivities(data);
             })
+        }
+        if (sideBar === 'detail') {
+            const storedDetail = localStorage.getItem('detail');
+            if (storedDetail) {
+                setDetail(JSON.parse(storedDetail));
+            }
         }
     }, [sideBar]);
 
@@ -125,12 +133,21 @@ const MainPage = (props) => {
             return [];
         })
     }
+    
+    const onClickCard = (act) => {
+        localStorage.setItem('source', sideBar);
+        localStorage.setItem('detail', JSON.stringify(act));
+        setDetail(act);
+        localStorage.setItem('sideBar', 'detail');
+        setSideBar('detail');
+    }
+
     const childrenComponent = () => {
         switch(sideBar){
             case 'dashboard':
                 return <HomeContent username={username} />;
             case 'activities':{
-                return <ActivitySquare userId={id} activities={activities} />;
+                return <ActivitySquare userId={id} activities={activities} onClickCard={onClickCard}/>;
             }
             case 'my-activities':
                 return <MyActivity 
@@ -138,9 +155,12 @@ const MainPage = (props) => {
                             registerActivities={myRegisterActivies} 
                             participateActivities={myParticipateActivities} 
                             onActivityDeleted={() => getMyRegisterActivities().then(data => setMyRegisterActivities(data))}
+                            onClickCard={onClickCard}
                         />;
             case 'account':
                 return <AccountManager id={id} userData={userData} onUpdate={onUpdate} />
+            case 'detail':
+                return <ActDetail userId={id} activity={detail} setSideBar={setSideBar} />
             default:
                 return null;
         }
@@ -149,6 +169,9 @@ const MainPage = (props) => {
     const registerActivity = (formData) =>{
         axios.post('http://127.0.0.1:7001/activity/register', formData).then(response => {
             console.log(response.data.message);
+            getMyRegisterActivities().then(data => {
+                setMyRegisterActivities(data);
+            })
             setShowCreateActivityDialog(false);
         }).catch(error => {
             if(error.response){
@@ -171,7 +194,13 @@ const MainPage = (props) => {
     return (
         <div>
             <NavBar avatarUrl={avatarUrl} />
-            <SideBar activeMenu={sideBar} setActiveMenu={setSideBar} setShowCreateActivityDialog={setShowCreateActivityDialog} />
+            <SideBar activeMenu={sideBar} 
+                setActiveMenu={(id) => {
+                    localStorage.setItem('sideBar', id);
+                    setSideBar(id);
+                }}
+                setShowCreateActivityDialog={setShowCreateActivityDialog} 
+            />
             {childrenComponent()}
             {showCreateActivityDialog &&(<CreateActivityDialog hostId={id} cancel={() => setShowCreateActivityDialog(false)} confirm={registerActivity} />)}
         </div>

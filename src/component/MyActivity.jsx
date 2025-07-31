@@ -1,6 +1,6 @@
 import ActivityCard from './ActivityCard'
 
-const MyActivity = ({userId,registerActivities, participateActivities, onActivityDeleted} ) => {
+const MyActivity = ({userId,registerActivities, participateActivities, onActivityDeleted, onClickCard} ) => {
     return (
         <main className="pt-28 pl-32 md:pl-64 pb-10">
             <div className="container mx-auto px-4 py-6">
@@ -12,7 +12,7 @@ const MyActivity = ({userId,registerActivities, participateActivities, onActivit
 
                     <div className="space-y-4">
                         {registerActivities.map(activity => (
-                            <ActivityCard userId={userId} key={activity.id} {...activity} onActivityDeleted={onActivityDeleted} />
+                            <ActivityCard userId={userId} key={activity.id} activity={activity} onActivityDeleted={onActivityDeleted} onClickCard={onClickCard} />
                         ))}
                     </div>
                 </section>
@@ -23,7 +23,7 @@ const MyActivity = ({userId,registerActivities, participateActivities, onActivit
 
                     <div className="space-y-4">
                         {participateActivities.map(activity => (
-                            <ActivityCard userId={userId} key={activity.id} {...activity} />
+                            <ActivityCard userId={userId} key={activity.id} activity={activity} onClickCard={onClickCard} />
                         ))}
                     </div>
                 </section>
