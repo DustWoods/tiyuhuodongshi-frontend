@@ -23,11 +23,11 @@ const MainPage = (props) => {
     })
 
     useEffect(() => {
-    if (sideBar === 'activities') {
-        getActivities().then(data => {
-            setActivities(data);
-        });
-    }
+        if (sideBar === 'activities') {
+            getActivities().then(data => {
+                setActivities(data);
+            });
+        }
     }, [sideBar]);
 
     const updateAvatarUrl = () => {
@@ -66,7 +66,7 @@ const MainPage = (props) => {
     }
 
     const getActivities = () => {
-        return axios.get('http://127.0.0.1:7001/activity/all').then(response => {
+        return axios.get(`http://127.0.0.1:7001/activity/all/${id}`).then(response => {
             return response.data.data.activities;
         }).catch(error => {
             if(error.response){
@@ -87,7 +87,7 @@ const MainPage = (props) => {
             case 'dashboard':
                 return <HomeContent username={username} />;
             case 'activities':{
-                return <ActivitySquare activities={activities} />;
+                return <ActivitySquare userId={id} activities={activities} />;
             }
             case 'my-activities':
                 return <MyActivity />;

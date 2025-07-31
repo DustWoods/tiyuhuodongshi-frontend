@@ -50,7 +50,7 @@ const SideBar = ({ activeMenu, setActiveMenu, setShowCreateActivityDialog }) => 
                 ))}
             </div>
                     
-            {activeMenu === 'activities' && (
+            {activeMenu === 'my-activities' && (
                 <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-neutral-200">
                     <CreateActivityButton onClick={setShowCreateActivityDialog} />
                 </div>

@@ -1,6 +1,6 @@
 import ActivityCard from './ActivityCard'
 
-const ActivitySquare = ({activities}) => {
+const ActivitySquare = ({userId, activities}) => {
     return (
         <main className="pt-28 pl-32 md:pl-64 pb-10">
             <div className="container mx-auto px-4 py-6">
@@ -12,7 +12,7 @@ const ActivitySquare = ({activities}) => {
 
                     <div className="space-y-4">
                         {activities.map(activity => (
-                            <ActivityCard key={activity.id} {...activity} />
+                            <ActivityCard userId={userId} key={activity.id} {...activity} />
                         ))}
                     </div>
                 </section>
