@@ -1,8 +1,8 @@
-import React from 'react'
+import { useState } from 'react'
 
 const ActivityCard = ({ id, name, type, date, location, participants }) => {
-    const [state, setState] = React.useState("立即报名");
-    const [color, setColor] = React.useState("blue-500");
+    const [state, setState] = useState("立即报名");
+    const [color, setColor] = useState("blue-500");
     const handleChange = (e) => {
         e.stopPropagation();
         setState("取消报名");
@@ -16,15 +16,16 @@ const ActivityCard = ({ id, name, type, date, location, participants }) => {
             onClick={moreInf}
         >
             <div className="flex items-start">
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-semibold mr-4"
+                <div className="w-16 h-16 rounded-lg flex items-center justify-center text-white font-semibold mr-4"
                     style={{
                         background: 'linear-gradient(135deg, #165DFF 0%, #36BFFA 100%)',
                         color: 'white'
                     }}
                 >
                     <span className="text-center">
-                        <span className="block text-xs">{date.split('月')[0]}月</span>
-                        <span className="block text-lg">{date.split('月')[1].split('日')[0]}</span>
+                        <span className="block text-xs">{date.split('-')[0]}年</span>
+                        <span className="block text-xs">{date.split('-')[1]}月</span>
+                        <span className="block text-lg">{date.split('-')[2].split('T')[0]}日</span>
                     </span>
                 </div>
                 <div className="flex-1">
@@ -33,7 +34,7 @@ const ActivityCard = ({ id, name, type, date, location, participants }) => {
                         <span>{type}</span>
                         <span className="mx-2">•</span>
                         <i className="far fa-clock mr-1"></i>
-                        <span>{date.split(' ')[1]}</span>
+                        <span>{date.split('-')[2].split('T')[1]}</span>
                     </div>
                     <div className="flex items-center text-sm text-neutral-500 mt-1">
                         <i className="fas fa-map-marker-alt mr-1"></i>

@@ -1,4 +1,3 @@
-import React from 'react'
 
 const MenuItem = ({ id, icon, label, isActive, onClick }) => {
     return (
@@ -12,7 +11,7 @@ const MenuItem = ({ id, icon, label, isActive, onClick }) => {
     );
 };
 
-const CreateActivityButton = () => {
+const CreateActivityButton = ({ onClick }) => {
     return (
         <button
             className="w-full py-2 rounded-lg font-medium shadow hover:shadow-md transition-all duration-200 flex items-center justify-center"
@@ -20,6 +19,7 @@ const CreateActivityButton = () => {
                 background: 'linear-gradient(135deg, #165DFF 0%, #36BFFA 100%)',
                 color: 'white'
             }}
+            onClick={() => onClick(true)}
         >
             <i className="fa fa-plus mr-2"></i>
             <span className="hidden md:block">创建活动</span>
@@ -27,7 +27,7 @@ const CreateActivityButton = () => {
     );
 };
 
-const SideBar = ({ activeMenu, setActiveMenu }) => {
+const SideBar = ({ activeMenu, setActiveMenu, setShowCreateActivityDialog }) => {
     const menuItems = [
         { id: 'dashboard', icon: 'fa-dashboard', label: '首页' },
         { id: 'activities', icon: 'fa-calendar', label: '活动广场' },
@@ -36,7 +36,7 @@ const SideBar = ({ activeMenu, setActiveMenu }) => {
     ];
             
     return (
-        <aside className="fixed left-0 top-28 bottom-0 w-16 md:w-64 bg-white shadow-md overflow-y-auto transition-all duration-300">
+        <aside className="fixed left-0 top-28 bottom-0 w-32 md:w-64 bg-white shadow-md overflow-y-auto transition-all duration-300">
             <div className="py-6">
                 {menuItems.map(item => (
                     <MenuItem 
@@ -52,7 +52,7 @@ const SideBar = ({ activeMenu, setActiveMenu }) => {
                     
             {activeMenu === 'activities' && (
                 <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-neutral-200">
-                    <CreateActivityButton />
+                    <CreateActivityButton onClick={setShowCreateActivityDialog} />
                 </div>
             )}
         </aside>
