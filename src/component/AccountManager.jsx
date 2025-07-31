@@ -270,7 +270,7 @@ const AccountManager = ({ id, userData, onUpdate }) => {
 
       {showLogoutDialog && (
         <ConfirmationDialog cancel={() => setShowLogoutDialog(false)} confirm={logout}
-        prompt={{first:'确定注销', second: '您确定注销该账号吗？点击确定无法找回任何账号信息'}} />
+        prompt={{first:'确定注销', second: '您确定注销该账号吗？点击确定无法找回任何账号信息。'}} />
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import ActivityCard from './ActivityCard'
 
-const MyActivity = ({userId,registerActivities, participateActivities} ) => {
+const MyActivity = ({userId,registerActivities, participateActivities, onActivityDeleted} ) => {
     return (
         <main className="pt-28 pl-32 md:pl-64 pb-10">
             <div className="container mx-auto px-4 py-6">
@@ -12,7 +12,7 @@ const MyActivity = ({userId,registerActivities, participateActivities} ) => {
 
                     <div className="space-y-4">
                         {registerActivities.map(activity => (
-                            <ActivityCard userId={userId} key={activity.id} {...activity} />
+                            <ActivityCard userId={userId} key={activity.id} {...activity} onActivityDeleted={onActivityDeleted} />
                         ))}
                     </div>
                 </section>

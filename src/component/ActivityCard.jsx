@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
+import ConfirmationDialog from './ConfirmationDialog';
 import axios from 'axios';
 
 // 提取API基础URL，便于维护
 const API_BASE_URL = 'http://127.0.0.1:7001/activity';
 
-const ActivityCard = ({ userId, id, name, type, date, location }) => {
+const ActivityCard = ({ userId, id, name, type, date, location, onActivityDeleted }) => {
     const [state, setState] = useState("立即报名");
     const [participants, setParticipants] = useState("0");
+    const [showCancelDialog, setShowCancelDialog] = useState(false);
     const [isLoading, setIsLoading] = useState(true); // 补充缺失的loading状态定义
 
     // 提取公共错误处理函数，减少重复代码
@@ -25,8 +27,7 @@ const ActivityCard = ({ userId, id, name, type, date, location }) => {
         try {
             const formData = { userId: userId, activityId: id };
             const response = await axios.post(`${API_BASE_URL}/relationship`, formData);
-            const flag = response.data.relationship;
-            setState(flag ? '取消报名' : '立即报名');
+            setState(response.data.state);
         } catch (error) {
             handleAxiosError(error);
             setState('立即报名');
@@ -64,20 +65,34 @@ const ActivityCard = ({ userId, id, name, type, date, location }) => {
     // 修正异步处理，统一使用await语法
     const handleChange = async (e) => {
         e.stopPropagation();
-        try {
-            const formData = { userId: userId, activityId: id };
-            const response = await axios.post(`${API_BASE_URL}/participation`, formData);
-            console.log(response.data.message);
-            // 操作成功后更新数据
-            await Promise.all([fetchRelationship(), fetchParticipants()]);
-        } catch (error) {
-            handleAxiosError(error);
+        if(state === '取消活动'){
+            setShowCancelDialog(true);
+        }
+        else{
+            try {
+                const formData = { userId: userId, activityId: id };
+                const response = await axios.post(`${API_BASE_URL}/participation`, formData);
+                console.log(response.data.message);
+                // 操作成功后更新数据
+                await Promise.all([fetchRelationship(), fetchParticipants()]);
+            } catch (error) {
+                handleAxiosError(error);
+            }
         }
     };
+    const deleteActivity = () => {
+        axios.get(`${API_BASE_URL}/${id}`).then(response => {
+            console.log(response.data.message);
+            onActivityDeleted && onActivityDeleted();
+        }).catch(error => {
+            handleAxiosError(error);
+        })
+    }
     const moreInf = () => {
         alert("hh");
     }
     return (
+      <>
         <div className="border border-gray-400 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200"
             onClick={moreInf}
         >
@@ -120,6 +135,12 @@ const ActivityCard = ({ userId, id, name, type, date, location }) => {
                 </button>
             </div>
         </div>
+        {showCancelDialog && (
+            <ConfirmationDialog cancel={() => setShowCancelDialog(false)} confirm={deleteActivity} 
+                prompt={{first: '确定取消活动', second: '您确定取消活动吗？点击确定无法找回任何信息。'}}
+            />
+        )}
+      </>
     );
 };
 

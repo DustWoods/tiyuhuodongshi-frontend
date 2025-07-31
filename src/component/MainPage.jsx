@@ -133,7 +133,12 @@ const MainPage = (props) => {
                 return <ActivitySquare userId={id} activities={activities} />;
             }
             case 'my-activities':
-                return <MyActivity userId={id} registerActivities={myRegisterActivies} participateActivities={myParticipateActivities} />;
+                return <MyActivity 
+                            userId={id} 
+                            registerActivities={myRegisterActivies} 
+                            participateActivities={myParticipateActivities} 
+                            onActivityDeleted={() => getMyRegisterActivities().then(data => setMyRegisterActivities(data))}
+                        />;
             case 'account':
                 return <AccountManager id={id} userData={userData} onUpdate={onUpdate} />
             default:
