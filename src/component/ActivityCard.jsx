@@ -70,7 +70,7 @@ const ActivityCard = ({ userId, activity, onActivityDeleted, onClickCard}) => {
         else{
             try {
                 const formData = { userId: userId, activityId: activity.id };
-                const response = await axios.post(`${API_BASE_URL}/participation`, formData);
+                const response = await axios.put(`${API_BASE_URL}/participation`, formData);
                 console.log(response.data.message);
                 // 操作成功后更新数据
                 await Promise.all([fetchRelationship(), fetchParticipants()]);

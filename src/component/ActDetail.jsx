@@ -8,6 +8,7 @@ const API_BASE_URL = 'http://127.0.0.1:7001';
 const ActivityDetailCard = ({ userId, username, activity, setSideBar }) => {
     const [state, setState] = useState("立即报名");
     const [participants, setParticipants] = useState("0");
+    const [comment, setComment] = useState(localStorage.getItem('comment')? JSON.parse(localStorage.getItem('comment')): []);
     const [showCancelDialog, setShowCancelDialog] = useState(false);
     const [showAddComment, setShowAddComment] = useState(false);
 
@@ -44,12 +45,24 @@ const ActivityDetailCard = ({ userId, username, activity, setSideBar }) => {
         }
     };
 
+    const fetchComment = async () => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/comment/${activity.id}`);
+            const data = response.data.comment;
+            localStorage.setItem('comment', JSON.stringify(data))
+            setComment(data);
+        } catch (error) {
+            handleAxiosError(error);
+            setParticipants([]);
+        }
+    }
+
     // 初始化加载数据逻辑
     useEffect(() => {
         const loadData = async () => {
             try {
                 // 并行请求，提升性能
-                await Promise.all([fetchRelationship(), fetchParticipants()]);
+                await Promise.all([fetchRelationship(), fetchParticipants(), fetchComment()]);
             } catch (error) {
                 console.log('数据加载失败');
             } finally {
@@ -69,7 +82,7 @@ const ActivityDetailCard = ({ userId, username, activity, setSideBar }) => {
         else{
             try {
                 const formData = { userId: userId, activityId: activity.id };
-                const response = await axios.post(`${API_BASE_URL}/activity/participation`, formData);
+                const response = await axios.put(`${API_BASE_URL}/activity/participation`, formData);
                 console.log(response.data.message);
                 // 操作成功后更新数据
                 await Promise.all([fetchRelationship(), fetchParticipants()]);
@@ -97,38 +110,14 @@ const ActivityDetailCard = ({ userId, username, activity, setSideBar }) => {
     const addComment = (formData) => {
         axios.post(`${API_BASE_URL}/comment`, formData).then(response => {
             console.log(response.data.message);
+            fetchComment();
         }).catch(error => {
             handleAxiosError(error);
         })
         setShowAddComment(false);
     }
     
-const sampleComments = [
-        {
-            id: 1,
-            userId: 1,
-            username: "张三",
-            time: "2025-07-03T12:22",
-            content: "这个活动看起来非常有趣，我很期待参加！",
-            likes: 12,
-            replies: [
-                {
-                    username: "李四",
-                    time: "2025-09-07T14:33",
-                    content: "是的，我也报名了，到时见！"
-                }
-            ]
-        },
-        {
-            userId: 1,
-            id: 2,
-            username: "王五",
-            time: "2024-03-12T17:44",
-            content: "请问需要自备装备吗？",
-            likes: 5
-        }
-    ];
-    return (
+   return (
         <>
         <div className="pt-28 pl-32 md:pl-64 pb-10 container mx-auto px-4 py-6">
             {/* 返回按钮 */}
@@ -201,12 +190,12 @@ const sampleComments = [
             </div>
             
             <div className="mt-8">
-                <h3 className="text-lg font-semibold mb-4">活动评论 ({sampleComments.length})</h3>
+                <h3 className="text-lg font-semibold mb-4">活动评论 ({comment.length})</h3>
                 
                 评论列表
                 <div className="space-y-4 mb-6">
-                    {sampleComments.map(comment => (
-                        <CommentCard key={comment.id} username={username} comment={comment} />
+                    {comment.map(comment => (
+                        <CommentCard key={comment.id} userId={userId} username={username} comment={comment} refresh={fetchComment} />
                     ))}
                 </div>
                 

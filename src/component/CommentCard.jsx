@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AddCommentDialog from './AddCommentDialog';
-import '@fortawesome/fontawesome-free/css/all.min.css';
+import axios from 'axios'
 
 const API_BASE_URL = 'http://127.0.0.1:7001';
 
-const CommentCard = ({ username, comment, size='0.75em' }) => {
-    const [isLiked, setIsLiked] = useState(true);
+const CommentCard = ({ userId, username, comment, refresh, size='0.75em' }) => {
+    const [isLiked, setIsLiked] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
     const [showReplyDialog, setShowReplyDialog] = useState(false);
 
@@ -20,14 +20,64 @@ const CommentCard = ({ username, comment, size='0.75em' }) => {
         }
     };
 
+    // 使用await重构异步函数，增强可读性
+    const fetchLiked = async () => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/comment/likes/${userId}/${comment.id}`);
+            setIsLiked(response.data.liked);
+        } catch (error) {
+            handleAxiosError(error);
+            setIsLiked(false);
+        }
+    };
+
+    // 使用await重构异步函数，增强可读性
+    const fetchLikeCount = async () => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/comment/likeCount/${comment.id}`);
+            setLikeCount(response.data.count);
+        } catch (error) {
+            handleAxiosError(error);
+            setLikeCount(0);
+        }
+    };
+
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                // 并行请求，提升性能
+                await Promise.all([fetchLiked(), fetchLikeCount()]);
+            } catch (error) {
+                console.log('数据加载失败');
+            } finally {
+                
+            }
+        };
+
+        loadData();
+    }, [userId, comment]); // 依赖项正确配置
+
+    const handleChange = async () => {
+        try {
+            const response = await axios.put(`${API_BASE_URL}/comment/likes/${userId}/${comment.id}`);
+            console.log(response.data.message);
+            // 操作成功后更新数据
+            await Promise.all([fetchLiked(), fetchLikeCount()]);
+        } catch (error) {
+            handleAxiosError(error);
+        }
+    }
     const addReply = (formData) => {
-        axios.post(`${API_BASE_URL}/reply`, formData).then(response => {
-            console.log(response.message);
+        console.log(formData);
+        axios.post(`${API_BASE_URL}/comment/reply`, formData).then(response => {
+            console.log(response.data.message);
+            refresh();
+            setShowReplyDialog(false);
         }).catch(error => {
             handleAxiosError(error);
         })
     }
-    
+
     return (
         <>
         <div className="bg-white rounded-xl shadow-sm p-5 mb-4 transition-all duration-300 hover:shadow-md">
@@ -52,7 +102,7 @@ const CommentCard = ({ username, comment, size='0.75em' }) => {
                     <div className="flex items-center text-sm justify-between">
                         {/* 点赞按钮 - 使用爱心图标 */}
                         <button
-                            onClick={() => console.log('dianzan')}
+                            onClick={handleChange}
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300 ${
                                 isLiked 
                                 ? 'bg-red-50 text-red-500 hover:bg-red-100' 
@@ -108,7 +158,7 @@ const CommentCard = ({ username, comment, size='0.75em' }) => {
                                 />
                             </div>
                         </button>
-                        <span>{comment.likes}</span>
+                        <span>{likeCount}</span>
                         
                         {/* 回复按钮 - 添加悬浮下划线效果 */}
                         <button className="flex items-center text-neutral-500 hover:text-primary transition-colors group ml-auto"
@@ -137,7 +187,7 @@ const CommentCard = ({ username, comment, size='0.75em' }) => {
             </div>
             {showReplyDialog && (
             <AddCommentDialog data={{
-                    conmmentId: comment.id,
+                    commentId: comment.id,
                     username: username,
                     time: new Date().toISOString().slice(0,16),
                 }}
