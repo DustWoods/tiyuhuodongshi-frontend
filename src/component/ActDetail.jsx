@@ -106,24 +106,24 @@ const ActivityDetailCard = ({ userId, username, activity, setSideBar }) => {
 const sampleComments = [
         {
             id: 1,
+            userId: 1,
             username: "张三",
-            avatar: "https://picsum.photos/id/1001/100/100",
-            time: "2小时前",
+            time: "2025-07-03T12:22",
             content: "这个活动看起来非常有趣，我很期待参加！",
             likes: 12,
             replies: [
                 {
                     username: "李四",
-                    time: "1小时前",
+                    time: "2025-09-07T14:33",
                     content: "是的，我也报名了，到时见！"
                 }
             ]
         },
         {
+            userId: 1,
             id: 2,
             username: "王五",
-            avatar: "https://picsum.photos/id/1002/100/100",
-            time: "昨天",
+            time: "2024-03-12T17:44",
             content: "请问需要自备装备吗？",
             likes: 5
         }
@@ -206,7 +206,7 @@ const sampleComments = [
                 评论列表
                 <div className="space-y-4 mb-6">
                     {sampleComments.map(comment => (
-                        <CommentCard key={comment.id} comment={comment} />
+                        <CommentCard key={comment.id} username={username} comment={comment} />
                     ))}
                 </div>
                 
