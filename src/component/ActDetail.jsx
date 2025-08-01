@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
-import CommentCard from './CommentCard'
-import axios from 'axios'
+import CommentCard from './CommentCard';
+import AddCommentDialog from './AddCommentDialog';
+import axios from 'axios';
 
-const API_BASE_URL = 'http://127.0.0.1:7001/activity';
+const API_BASE_URL = 'http://127.0.0.1:7001';
 
-const ActivityDetailCard = ({ userId, activity, setSideBar }) => {
+const ActivityDetailCard = ({ userId, username, activity, setSideBar }) => {
     const [state, setState] = useState("立即报名");
     const [participants, setParticipants] = useState("0");
     const [showCancelDialog, setShowCancelDialog] = useState(false);
-    const [isLoading, setIsLoading] = useState(true); // 补充缺失的loading状态定义
+    const [showAddComment, setShowAddComment] = useState(false);
 
     // 提取公共错误处理函数，减少重复代码
     const handleAxiosError = (error) => {
@@ -24,8 +25,7 @@ const ActivityDetailCard = ({ userId, activity, setSideBar }) => {
     // 使用await重构异步函数，增强可读性
     const fetchRelationship = async () => {
         try {
-            const formData = { userId: userId, activityId: activity.id };
-            const response = await axios.post(`${API_BASE_URL}/relationship`, formData);
+            const response = await axios.get(`${API_BASE_URL}/activity/relationship/${userId}/${activity.id}`);
             setState(response.data.state);
         } catch (error) {
             handleAxiosError(error);
@@ -36,7 +36,7 @@ const ActivityDetailCard = ({ userId, activity, setSideBar }) => {
     // 使用await重构异步函数，增强可读性
     const fetchParticipants = async () => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/participant/${activity.id}`);
+            const response = await axios.get(`${API_BASE_URL}/activity/participant/${activity.id}`);
             setParticipants(response.data.data.count);
         } catch (error) {
             handleAxiosError(error);
@@ -47,14 +47,13 @@ const ActivityDetailCard = ({ userId, activity, setSideBar }) => {
     // 初始化加载数据逻辑
     useEffect(() => {
         const loadData = async () => {
-            setIsLoading(true);
             try {
                 // 并行请求，提升性能
                 await Promise.all([fetchRelationship(), fetchParticipants()]);
             } catch (error) {
                 console.log('数据加载失败');
             } finally {
-                setIsLoading(false); // 无论成功失败都结束加载状态
+                
             }
         };
 
@@ -70,7 +69,7 @@ const ActivityDetailCard = ({ userId, activity, setSideBar }) => {
         else{
             try {
                 const formData = { userId: userId, activityId: activity.id };
-                const response = await axios.post(`${API_BASE_URL}/participation`, formData);
+                const response = await axios.post(`${API_BASE_URL}/activity/participation`, formData);
                 console.log(response.data.message);
                 // 操作成功后更新数据
                 await Promise.all([fetchRelationship(), fetchParticipants()]);
@@ -79,6 +78,7 @@ const ActivityDetailCard = ({ userId, activity, setSideBar }) => {
             }
         }
     };
+
     const deleteActivity = () => {
         axios.get(`${API_BASE_URL}/${id}`).then(response => {
             console.log(response.data.message);
@@ -87,11 +87,22 @@ const ActivityDetailCard = ({ userId, activity, setSideBar }) => {
             handleAxiosError(error);
         })
     }
+
     const goBack = () => {
         const src = localStorage.getItem('source');
         localStorage.setItem('sideBar', src);
         setSideBar(src);
     }   
+
+    const addComment = (formData) => {
+        axios.post(`${API_BASE_URL}/comment`, formData).then(response => {
+            console.log(response.data.message);
+        }).catch(error => {
+            handleAxiosError(error);
+        })
+        setShowAddComment(false);
+    }
+    
 const sampleComments = [
         {
             id: 1,
@@ -202,6 +213,7 @@ const sampleComments = [
                 {/* 发表评论按钮 */}
                 <button 
                     className="w-full py-2 rounded-lg font-medium shadow hover:shadow-md transition-all duration-200 flex items-center justify-center border border-primary text-primary hover:bg-primary/5"
+                    onClick={() => setShowAddComment(true)}
                 >
                     <span className="mr-2">💬</span>
                     <span>发表评论</span>
@@ -211,6 +223,17 @@ const sampleComments = [
         {showCancelDialog && (
             <ConfirmationDialog cancel={() => setShowCancelDialog(false)} confirm={deleteActivity} 
                 prompt={{first: '确定取消活动', second: '您确定取消活动吗？点击确定无法找回任何信息。'}}
+            />
+        )}
+        {showAddComment && (
+            <AddCommentDialog data={{
+                    activityId: activity.id,
+                    userId: userId,
+                    username: username,
+                    time: new Date().toISOString().slice(0,16),
+                }}
+                cancel={() => setShowAddComment(false)}
+                confirm={addComment}
             />
         )}
         </>
