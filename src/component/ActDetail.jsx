@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import CommentCard from './CommentCard';
 import AddCommentDialog from './AddCommentDialog';
+import ConfirmationDialog from './ConfirmationDialog';
 import axios from 'axios';
 
 const API_BASE_URL = 'http://127.0.0.1:7001';
 
-const ActivityDetailCard = ({ userId, username, activity, setSideBar }) => {
+const ActivityDetailCard = ({ userId, username, activity, setSideBar, deleteActivity }) => {
     const [state, setState] = useState("立即报名");
     const [participants, setParticipants] = useState("0");
     const [comment, setComment] = useState(localStorage.getItem('comment')? JSON.parse(localStorage.getItem('comment')): []);
@@ -92,14 +93,6 @@ const ActivityDetailCard = ({ userId, username, activity, setSideBar }) => {
         }
     };
 
-    const deleteActivity = () => {
-        axios.get(`${API_BASE_URL}/${id}`).then(response => {
-            console.log(response.data.message);
-            onActivityDeleted && onActivityDeleted();
-        }).catch(error => {
-            handleAxiosError(error);
-        })
-    }
 
     const goBack = () => {
         const src = localStorage.getItem('source');
@@ -117,7 +110,21 @@ const ActivityDetailCard = ({ userId, username, activity, setSideBar }) => {
         setShowAddComment(false);
     }
     
-   return (
+    const getTime = () => {
+        const date = new Date();
+  
+        // 提取本地时间组件（注意月份从0开始，需+1）
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // 补0至2位（如8→"08"）
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0'); // 24小时制
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+        // 拼接为 "YYYY-MM-DDTHH:MM" 格式
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    return (
         <>
         <div className="pt-28 pl-32 md:pl-64 pb-10 container mx-auto px-4 py-6">
             {/* 返回按钮 */}
@@ -210,7 +217,7 @@ const ActivityDetailCard = ({ userId, username, activity, setSideBar }) => {
             </div>
         </div>
         {showCancelDialog && (
-            <ConfirmationDialog cancel={() => setShowCancelDialog(false)} confirm={deleteActivity} 
+            <ConfirmationDialog cancel={() => setShowCancelDialog(false)} confirm={() => deleteActivity(activity.id)} 
                 prompt={{first: '确定取消活动', second: '您确定取消活动吗？点击确定无法找回任何信息。'}}
             />
         )}
@@ -219,7 +226,7 @@ const ActivityDetailCard = ({ userId, username, activity, setSideBar }) => {
                     activityId: activity.id,
                     userId: userId,
                     username: username,
-                    time: new Date().toISOString().slice(0,16),
+                    time: getTime(),
                 }}
                 cancel={() => setShowAddComment(false)}
                 confirm={addComment}

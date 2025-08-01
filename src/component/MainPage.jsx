@@ -141,7 +141,16 @@ const MainPage = (props) => {
         localStorage.setItem('sideBar', 'detail');
         setSideBar('detail');
     }
-
+    const deleteActivity = (id) => {
+        setSideBar(localStorage.getItem('source'));
+        const newActivity = myRegisterActivies.filter(item => item.id !== id);
+        setMyRegisterActivities(newActivity);
+        axios.delete(`http://127.0.0.1:7001/activity/${id}`).then(response => {
+            console.log(response.data.message);
+        }).catch(error => {
+            handleAxiosError(error);
+        })
+    }
     const childrenComponent = () => {
         switch(sideBar){
             case 'dashboard':
@@ -160,7 +169,13 @@ const MainPage = (props) => {
             case 'account':
                 return <AccountManager id={id} userData={userData} onUpdate={onUpdate} />
             case 'detail':
-                return <ActDetail userId={id} username={username} activity={detail} setSideBar={setSideBar} />
+                return <ActDetail 
+                    userId={id} 
+                    username={username} 
+                    activity={detail} 
+                    setSideBar={setSideBar} 
+                    deleteActivity={deleteActivity}
+                />
             default:
                 return null;
         }

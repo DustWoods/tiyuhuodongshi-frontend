@@ -68,7 +68,6 @@ const CommentCard = ({ userId, username, comment, refresh, size='0.75em' }) => {
         }
     }
     const addReply = (formData) => {
-        console.log(formData);
         axios.post(`${API_BASE_URL}/comment/reply`, formData).then(response => {
             console.log(response.data.message);
             refresh();
@@ -77,7 +76,19 @@ const CommentCard = ({ userId, username, comment, refresh, size='0.75em' }) => {
             handleAxiosError(error);
         })
     }
-
+    const getTime = () => {
+        const date = new Date();
+  
+        // 提取本地时间组件（注意月份从0开始，需+1）
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // 补0至2位（如8→"08"）
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0'); // 24小时制
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+        // 拼接为 "YYYY-MM-DDTHH:MM" 格式
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
     return (
         <>
         <div className="bg-white rounded-xl shadow-sm p-5 mb-4 transition-all duration-300 hover:shadow-md">
@@ -189,7 +200,7 @@ const CommentCard = ({ userId, username, comment, refresh, size='0.75em' }) => {
             <AddCommentDialog data={{
                     commentId: comment.id,
                     username: username,
-                    time: new Date().toISOString().slice(0,16),
+                    time: getTime(),
                 }}
                 cancel={() => setShowReplyDialog(false)}
                 confirm={addReply}
