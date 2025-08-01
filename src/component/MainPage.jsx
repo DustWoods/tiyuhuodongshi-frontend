@@ -56,7 +56,7 @@ const MainPage = (props) => {
 
     let userData = {username: props.username, avatarUrl: avatarUrl};
     const onUpdate = (updatedData) => {
-        axios.post(`http://127.0.0.1:7001/user/modification/${id}`, updatedData).then(response => {
+        axios.put(`http://127.0.0.1:7001/user/${id}`, updatedData).then(response => {
             if(!response.data.success){
                 alert(response.data.message);
             }
@@ -160,14 +160,14 @@ const MainPage = (props) => {
             case 'account':
                 return <AccountManager id={id} userData={userData} onUpdate={onUpdate} />
             case 'detail':
-                return <ActDetail userId={id} activity={detail} setSideBar={setSideBar} />
+                return <ActDetail userId={id} username={username} activity={detail} setSideBar={setSideBar} />
             default:
                 return null;
         }
     }
 
     const registerActivity = (formData) =>{
-        axios.post('http://127.0.0.1:7001/activity/register', formData).then(response => {
+        axios.post('http://127.0.0.1:7001/activity', formData).then(response => {
             console.log(response.data.message);
             getMyRegisterActivities().then(data => {
                 setMyRegisterActivities(data);

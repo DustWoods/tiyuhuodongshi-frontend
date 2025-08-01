@@ -25,8 +25,7 @@ const ActivityCard = ({ userId, activity, onActivityDeleted, onClickCard}) => {
     // 使用await重构异步函数，增强可读性
     const fetchRelationship = async () => {
         try {
-            const formData = { userId: userId, activityId: activity.id };
-            const response = await axios.post(`${API_BASE_URL}/relationship`, formData);
+            const response = await axios.get(`${API_BASE_URL}/relationship/${userId}/${activity.id}`);
             setState(response.data.state);
         } catch (error) {
             handleAxiosError(error);
@@ -81,7 +80,7 @@ const ActivityCard = ({ userId, activity, onActivityDeleted, onClickCard}) => {
         }
     };
     const deleteActivity = () => {
-        axios.get(`${API_BASE_URL}/${activity.id}`).then(response => {
+        axios.delete(`${API_BASE_URL}/${activity.id}`).then(response => {
             console.log(response.data.message);
             onActivityDeleted && onActivityDeleted();
         }).catch(error => {

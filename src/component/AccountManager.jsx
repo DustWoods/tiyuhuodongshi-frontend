@@ -52,7 +52,7 @@ const AccountManager = ({ id, userData, onUpdate }) => {
   }
 
   const logout = () => {
-    axios.get(`http://127.0.0.1:7001/user/logout/${id}`).then(response => {
+    axios.delete(`http://127.0.0.1:7001/user/${id}`).then(response => {
       console.log(response.data.message);
       logOut();
     }).catch(error => {
