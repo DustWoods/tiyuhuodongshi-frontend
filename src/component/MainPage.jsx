@@ -141,6 +141,7 @@ const MainPage = (props) => {
         localStorage.setItem('sideBar', 'detail');
         setSideBar('detail');
     }
+
     const deleteActivity = (id) => {
         setSideBar(localStorage.getItem('source'));
         const newActivity = myRegisterActivies.filter(item => item.id !== id);
@@ -151,12 +152,37 @@ const MainPage = (props) => {
             handleAxiosError(error);
         })
     }
+
+    const onSubmit = (searchTerm) => {
+        const targets = searchTerm
+            .split(/[\s,年日月]+/)  // 匹配一个或多个指定分隔符
+            .filter(t => t); 
+        const newActivities = activities.filter(item => {
+            return Object.values(item).some(value => {
+                return typeof value === 'string' && targets.some(target => value.includes(target));
+            });
+        });
+        setActivities(newActivities);
+    }
+
+    const onCancel = () => {
+        getActivities().then(data => {
+                setActivities(data);
+            });
+    }
+
     const childrenComponent = () => {
         switch(sideBar){
             case 'dashboard':
                 return <HomeContent username={username} />;
             case 'activities':{
-                return <ActivitySquare userId={id} activities={activities} onClickCard={onClickCard}/>;
+                return <ActivitySquare 
+                    userId={id} 
+                    activities={activities} 
+                    onClickCard={onClickCard}
+                    onSubmit={onSubmit}
+                    onCancel={onCancel}
+                    />;
             }
             case 'my-activities':
                 return <MyActivity 
@@ -203,9 +229,7 @@ const MainPage = (props) => {
             }
         })
     }
-    const test = (e) => {
-        console.log(e);
-    }
+    
     return (
         <div>
             <NavBar avatarUrl={avatarUrl} />
