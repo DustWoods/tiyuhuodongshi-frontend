@@ -48,9 +48,7 @@ const CommentCard = ({ userId, username, comment, refresh, size='0.75em' }) => {
                 // 并行请求，提升性能
                 await Promise.all([fetchLiked(), fetchLikeCount()]);
             } catch (error) {
-                console.log('数据加载失败');
-            } finally {
-                
+                handleAxiosError(error);
             }
         };
 

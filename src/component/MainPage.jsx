@@ -13,7 +13,7 @@ const MainPage = (props) => {
     const id = props.id || localStorage.getItem('id');
     const [username, setUsername] = useState(props.username || localStorage.getItem('username'));
     const [avatarUrl, setAvatarUrl] = useState(`http://127.0.0.1:7001/user/avatar/${id}`);
-    const [sideBar, setSideBar] = useState('' || localStorage.getItem('sideBar'));
+    const [sideBar, setSideBar] = useState(localStorage.getItem('sideBar') || '');
     const [activities, setActivities] = useState([]);
     const [myRegisterActivies, setMyRegisterActivities] = useState([]);
     const [myParticipateActivities, setMyParticipateAxtivities] = useState([]);
@@ -24,7 +24,7 @@ const MainPage = (props) => {
         if(storedAvatarUrl){
             setAvatarUrl(storedAvatarUrl);
         }
-    })
+    },[avatarUrl])
 
     useEffect(() => {
         if (sideBar === 'activities') {
@@ -149,7 +149,15 @@ const MainPage = (props) => {
         axios.delete(`http://127.0.0.1:7001/activity/${id}`).then(response => {
             console.log(response.data.message);
         }).catch(error => {
-            handleAxiosError(error);
+            if(error.response){
+                console.log(error.response.data.message);
+            }
+            else if(error.request){
+                console.log('请求未响应');
+            }
+            else{
+                console.log('请求失败');
+            }
         })
     }
 

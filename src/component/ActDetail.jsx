@@ -65,9 +65,7 @@ const ActivityDetailCard = ({ userId, username, activity, setSideBar, deleteActi
                 // 并行请求，提升性能
                 await Promise.all([fetchRelationship(), fetchParticipants(), fetchComment()]);
             } catch (error) {
-                console.log('数据加载失败');
-            } finally {
-                
+                handleAxiosError(error);
             }
         };
 

@@ -9,7 +9,6 @@ const ActivityCard = ({ userId, activity, onActivityDeleted, onClickCard}) => {
     const [state, setState] = useState("立即报名");
     const [participants, setParticipants] = useState("0");
     const [showCancelDialog, setShowCancelDialog] = useState(false);
-    const [isLoading, setIsLoading] = useState(true); // 补充缺失的loading状态定义
 
     // 提取公共错误处理函数，减少重复代码
     const handleAxiosError = (error) => {
@@ -47,14 +46,11 @@ const ActivityCard = ({ userId, activity, onActivityDeleted, onClickCard}) => {
     // 初始化加载数据逻辑
     useEffect(() => {
         const loadData = async () => {
-            setIsLoading(true);
             try {
                 // 并行请求，提升性能
                 await Promise.all([fetchRelationship(), fetchParticipants()]);
             } catch (error) {
-                console.log('数据加载失败');
-            } finally {
-                setIsLoading(false); // 无论成功失败都结束加载状态
+                handleAxiosError(error);
             }
         };
 
