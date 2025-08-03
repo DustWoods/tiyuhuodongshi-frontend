@@ -3,7 +3,7 @@ import WelcomePage from './component/WelcomePage';
 import LoginPage from './component/LoginPage';
 import RegisterPage from './component/RegisterPage';
 import MainPage from './component/MainPage';
-import { Routes, Route} from 'react-router';
+import { Routes, Route, Navigate } from 'react-router';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const App = () => {
@@ -21,7 +21,8 @@ const App = () => {
     }, []);
     return (
         <Routes>
-            <Route index element={<WelcomePage />} />
+            <Route path="/" element={<WelcomePage />} />
+            <Route path="/index.html" element={<Navigate to="/" replace />} />
             <Route path="/login" element={<LoginPage setId={setId} setUsername={setUsername} />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/main" element={<MainPage id={id} username={username} setUsername={setUsername} />} />

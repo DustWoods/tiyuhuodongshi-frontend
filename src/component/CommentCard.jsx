@@ -94,7 +94,7 @@ const CommentCard = ({ userId, username, comment, refresh, size='0.75em' }) => {
                 {/* 用户头像 */}
                 <div className="mr-4">
                     <div className="w-10 h-10 rounded-full bg-neutral-200 overflow-hidden">
-                        <img src={`http://127.0.0.1:7001/user/avatar/${comment.userId}`} alt={comment.username} className="w-full h-full object-cover" />
+                        <img src={`http://127.0.0.1:7001/user/avatar/${comment.userId}?t=${new Date().getTime()}`} alt={comment.username} className="w-full h-full object-cover" />
                     </div>
                 </div>
                 
